@@ -1,0 +1,30 @@
+# Ignora arquivos bytecode do Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ambientes virtuais
+.venv/
+venv/
+
+# Arquivos de log e temporários
+*.log
+*.bak
+*.tmp
+*.swp
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Configurações de IDEs/editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Arquivos de cache do pip
+pip-wheel-metadata/
+*.egg-info/
+dist/
+build/
