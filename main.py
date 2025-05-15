@@ -1,15 +1,16 @@
 import tkinter as tk
 import sympy as sp
 import re
-from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 from customtkinter import *
 
-resultados = []
 plt.rcParams.update({
     "text.usetex":True,
 })
+set_appearance_mode("light")
+WHITE_COLOR = "#ebebeb"
+
 class IntegralCalculatorApp(CTk):
     def __init__(self):
         self.fig, self.ax = plt.subplots()
@@ -33,7 +34,7 @@ class IntegralCalculatorApp(CTk):
         self.create_symbol_keyboard()
 
         # Frame dos botões
-        button_frame = CTkFrame(self)
+        button_frame = CTkFrame(self, bg_color=WHITE_COLOR, fg_color=WHITE_COLOR)
         button_frame.pack(pady=(10, 15))
 
         # Botão "Derivar"
@@ -44,22 +45,23 @@ class IntegralCalculatorApp(CTk):
         self.btn_integrate = CTkButton(button_frame, text="Integrar", command=self.integrate)
         self.btn_integrate.pack(side="left", padx=10)
 
+        # Label "Saída"
+        self.label_output = CTkLabel(self, text="Saída", font=("Arial", 14))
+        self.label_output.pack(pady=(0, 0))
+
         # Campo de saída
         # self.output_entry = CTkTextbox(  self, font=("Arial", 12))
         # self.output_entry.pack(pady=(10, 50))
 
         self.output_canvas = FigureCanvasTkAgg(self.fig, self)
-        self.canvasWidget = self.output_canvas.get_tk_widget()
-        self.canvasWidget.configure(height=200,width=300)
-        self.canvasWidget.pack()
+        self.output_widget = self.output_canvas.get_tk_widget()
+        self.output_widget.configure(height=200,width=300)
+        self.output_widget.pack()
 
-        # Label "Saída"
-        self.label_output = CTkLabel(self, text="Saída", font=("Arial", 14))
-        self.label_output.pack(pady=(0, 0))
 
     # Função para criar o teclado de símbolos
     def create_symbol_keyboard(self):
-        symbol_frame = CTkFrame(self)
+        symbol_frame = CTkFrame(self, fg_color=WHITE_COLOR)
         symbol_frame.pack(pady=(0, 10))
 
         symbols = [
@@ -71,7 +73,7 @@ class IntegralCalculatorApp(CTk):
         ]
 
         for i, (label, insert_text) in enumerate(symbols):
-            btn = CTkButton(symbol_frame, text=label, width=4,
+            btn = CTkButton(symbol_frame, text=label, width=50,
                              command=lambda txt=insert_text: self.insert_symbol(txt))
             btn.grid(row=i // 6, column=i % 6, padx=2, pady=2)
 
@@ -118,6 +120,7 @@ class IntegralCalculatorApp(CTk):
             func = self.parse_input(func_str)
             first_derivative = sp.diff(func, x)
             second_derivative = sp.diff(func, x, 2)
+            self.update_plot(f"1º Ordem:${sp.latex(sp.simplify(first_derivative))}$\n2º Ordem:${sp.latex(sp.simplify(second_derivative))}$", 20)
             result = (
                 f"1ª derivada: {self.format_output_readable(sp.simplify(first_derivative))} \n" +
                 f"2ª derivada: {self.format_output_readable(sp.simplify(second_derivative))}"
@@ -125,28 +128,43 @@ class IntegralCalculatorApp(CTk):
         except Exception as e:
             result = f"Erro: {e}"
         
-        self.output_entry.configure(state="normal")
-        self.output_entry.delete("0.0", "end")
-        self.output_entry.insert("0.0", result)
-        self.output_entry.configure(state="disabled")
+        print(result)
+        self.output_canvas.draw()
 
     #Função de integral
     def integrate(self):
-        self.canvasWidget.delete(ALL)
+        self.output_widget.delete(ALL)
 
         func_str = self.input_entry.get()
         x = sp.symbols('x')
         try:
             func = self.parse_input(func_str)
             integral = sp.integrate(func, x)
-            self.ax.text(0.5,0.5,f"${sp.latex(sp.simplify(integral))}$",fontsize=25)
+            self.update_plot(f"${sp.latex(sp.simplify(integral))}$")
+            
             result = f"Integral indefinida: {sp.latex(sp.simplify(integral))} + C"
         except Exception as e:
             result = f"Erro: {e}"
+        
+        print(result)
+
         self.output_canvas.draw()
 
-    def clearPlot(self):
-        
+    # Destroi e recria o canvas de resposta com uma nova equação
+    def update_plot(self, new_text, font_size=25):
+        self.output_widget.destroy()
+        self.output_widget = None
+        self.output_canvas = None
+
+        self.fig, self.ax = plt.subplots()
+        self.ax.axis("off")
+
+        self.output_canvas = FigureCanvasTkAgg(self.fig, self)
+        self.output_widget = self.output_canvas.get_tk_widget()
+        self.output_widget.configure(height=200,width=300, bg="black")
+        self.output_widget.pack()
+
+        self.ax.text(-0.1,0.1, new_text, fontsize=font_size)
 
 # Execução principal
 if __name__ == "__main__":

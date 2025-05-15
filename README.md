@@ -5,11 +5,14 @@ Uma aplicação simples feita com `tkinter` e `sympy` que permite calcular deriv
 ## 📦 Requisitos
 
 - Python 3.7 ou superior
+- [LaTex](https://www.latex-project.org/)
 - Bibliotecas:
   - sympy
   - tkinter (já incluída com Python na maioria dos sistemas)
+  - customtkinter
 
 Instale as dependências com:
 
 ```bash
 pip install -r requirements.txt
+```
