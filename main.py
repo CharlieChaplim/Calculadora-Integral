@@ -18,8 +18,9 @@ class IntegralCalculatorApp(CTk):
         super().__init__()
         self.title("Calculadora Integral")
         self.geometry("420x400")
-        self.resizable(False, False)
         self.create_widgets()
+
+    
 
     def create_widgets(self):
         # Label "Entrada" no topo
@@ -55,8 +56,9 @@ class IntegralCalculatorApp(CTk):
 
         self.output_canvas = FigureCanvasTkAgg(self.fig, self)
         self.output_widget = self.output_canvas.get_tk_widget()
-        self.output_widget.configure(height=200,width=300)
+        self.output_widget.configure()
         self.output_widget.pack()
+        self.output_widget.after(400, self.update_canvas_size)
 
 
     # Função para criar o teclado de símbolos
@@ -120,7 +122,7 @@ class IntegralCalculatorApp(CTk):
             func = self.parse_input(func_str)
             first_derivative = sp.diff(func, x)
             second_derivative = sp.diff(func, x, 2)
-            self.update_plot(f"1º Ordem:${sp.latex(sp.simplify(first_derivative))}$\n2º Ordem:${sp.latex(sp.simplify(second_derivative))}$", 20)
+            self.update_plot(f"1º Ordem:${sp.latex(sp.simplify(first_derivative))}$\n2º Ordem:${sp.latex(sp.simplify(second_derivative))}$", 18)
             result = (
                 f"1ª derivada: {self.format_output_readable(sp.simplify(first_derivative))} \n" +
                 f"2ª derivada: {self.format_output_readable(sp.simplify(second_derivative))}"
@@ -159,12 +161,22 @@ class IntegralCalculatorApp(CTk):
         self.fig, self.ax = plt.subplots()
         self.ax.axis("off")
 
+        width = self.winfo_width()
+        height = self.winfo_height()
+
         self.output_canvas = FigureCanvasTkAgg(self.fig, self)
         self.output_widget = self.output_canvas.get_tk_widget()
-        self.output_widget.configure(height=200,width=300, bg="black")
+        self.output_widget.configure(height=height//2,width=width//2)
         self.output_widget.pack()
+        self.output_widget.after(400, self.update_canvas_size)
 
         self.ax.text(-0.1,0.1, new_text, fontsize=font_size)
+
+    def update_canvas_size(self):
+        width = self.winfo_width()
+        height = self.winfo_height()
+        self.output_widget.configure(height=height//2,width=width//2)
+        self.output_widget.after(400, self.update_canvas_size)
 
 # Execução principal
 if __name__ == "__main__":
