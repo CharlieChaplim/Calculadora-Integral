@@ -17,43 +17,43 @@ class IntegralCalculatorApp(CTk):
         self.ax.axis("off")
         super().__init__()
         self.title("Calculadora Integral")
-        self.geometry("420x400")
+        self.geometry("420x500")
         self.create_widgets()
 
     
 
     def create_widgets(self):
-        # Label "Entrada" no topo
-        self.label_input = CTkLabel(self, text="Entrada", font=("Arial", 14))
-        self.label_input.pack(pady=(20, 5))
+        self.configure(fg_color="#f5f5f5")
 
-        # Campo de entrada para o usuário digitar a função
-        self.input_entry = CTkEntry(self, font=("Arial", 12), justify="center")
+        # Título
+        title_label = CTkLabel(self, text="🧮 Calculadora de Integrais e Derivadas", font=("Arial", 18, "bold"), text_color="#2c3e50")
+        title_label.pack(pady=(15, 5))
+
+        # Campo de entrada
+        self.label_input = CTkLabel(self, text="Digite a função:", font=("Arial", 14))
+        self.label_input.pack(pady=(10, 3))
+
+        self.input_entry = CTkEntry(self, font=("Arial", 13), justify="center", corner_radius=10, height=35)
         self.input_entry.pack(fill="x", padx=60, pady=(0, 10))
 
-        # Mini teclado de símbolos
+        # Teclado de símbolos
         self.create_symbol_keyboard()
 
-        # Frame dos botões
-        button_frame = CTkFrame(self, bg_color=WHITE_COLOR, fg_color=WHITE_COLOR)
+        # Botões Derivar e Integrar
+        button_frame = CTkFrame(self, fg_color="#f5f5f5")
         button_frame.pack(pady=(10, 15))
 
-        # Botão "Derivar"
-        self.btn_derive = CTkButton(button_frame, text="Derivar", command=self.derive)
+        self.btn_derive = CTkButton(button_frame, text="🔁 Derivar", command=self.derive, width=130, height=35, corner_radius=8)
         self.btn_derive.pack(side="left", padx=10)
 
-        # Botão "Integrar"
-        self.btn_integrate = CTkButton(button_frame, text="Integrar", command=self.integrate)
+        self.btn_integrate = CTkButton(button_frame, text="∫ Integrar", command=self.integrate, width=130, height=35, corner_radius=8)
         self.btn_integrate.pack(side="left", padx=10)
 
-        # Label "Saída"
-        self.label_output = CTkLabel(self, text="Saída", font=("Arial", 14))
-        self.label_output.pack(pady=(0, 0))
+        # Label de saída
+        self.label_output = CTkLabel(self, text="Saída", font=("Arial", 14, "bold"), text_color="#2c3e50")
+        self.label_output.pack(pady=(5, 0))
 
-        # Campo de saída
-        # self.output_entry = CTkTextbox(  self, font=("Arial", 12))
-        # self.output_entry.pack(pady=(10, 50))
-
+        # Canvas para saída
         self.output_canvas = FigureCanvasTkAgg(self.fig, self)
         self.output_widget = self.output_canvas.get_tk_widget()
         self.output_widget.configure()
@@ -122,38 +122,50 @@ class IntegralCalculatorApp(CTk):
             func = self.parse_input(func_str)
             first_derivative = sp.diff(func, x)
             second_derivative = sp.diff(func, x, 2)
-            self.update_plot(f"1º Ordem:${sp.latex(sp.simplify(first_derivative))}$\n2º Ordem:${sp.latex(sp.simplify(second_derivative))}$", 18)
+            
+            self.update_plot(
+                f"1º Ordem:${sp.latex(sp.simplify(first_derivative))}$\n2º Ordem:${sp.latex(sp.simplify(second_derivative))}$",
+                font_size=18,
+                x_pos=0.1,
+                y_pos=0.3
+            )
+
             result = (
                 f"1ª derivada: {self.format_output_readable(sp.simplify(first_derivative))} \n" +
                 f"2ª derivada: {self.format_output_readable(sp.simplify(second_derivative))}"
             )
         except Exception as e:
             result = f"Erro: {e}"
-        
+
         print(result)
         self.output_canvas.draw()
 
+
     #Função de integral
     def integrate(self):
-        self.output_widget.delete(ALL)
-
         func_str = self.input_entry.get()
         x = sp.symbols('x')
         try:
             func = self.parse_input(func_str)
             integral = sp.integrate(func, x)
-            self.update_plot(f"${sp.latex(sp.simplify(integral))}$")
             
+            self.update_plot(
+                f"${sp.latex(sp.simplify(integral))}$",
+                font_size=25,
+                x_pos=0.4,
+                y_pos=0.5
+            )
+
             result = f"Integral indefinida: {sp.latex(sp.simplify(integral))} + C"
         except Exception as e:
             result = f"Erro: {e}"
-        
-        print(result)
 
+        print(result)
         self.output_canvas.draw()
 
+
     # Destroi e recria o canvas de resposta com uma nova equação
-    def update_plot(self, new_text, font_size=25):
+    def update_plot(self, new_text, font_size=25, x_pos=0.4, y_pos=0.5):
         self.output_widget.destroy()
         self.output_widget = None
         self.output_canvas = None
@@ -166,11 +178,11 @@ class IntegralCalculatorApp(CTk):
 
         self.output_canvas = FigureCanvasTkAgg(self.fig, self)
         self.output_widget = self.output_canvas.get_tk_widget()
-        self.output_widget.configure(height=height//2,width=width//2)
+        self.output_widget.configure(height=height//2, width=width//2)
         self.output_widget.pack()
         self.output_widget.after(400, self.update_canvas_size)
 
-        self.ax.text(-0.1,0.1, new_text, fontsize=font_size)
+        self.ax.text(x_pos, y_pos, new_text, fontsize=font_size)
 
     def update_canvas_size(self):
         width = self.winfo_width()
