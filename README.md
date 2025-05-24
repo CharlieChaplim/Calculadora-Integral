@@ -15,6 +15,7 @@ sudo apt-get install dvipng texlive-latex-extra texlive-fonts-recommended cm-sup
   - sympy
   - tkinter (já incluída com Python na maioria dos sistemas)
   - customtkinter
+  - matplotlib
 
 Instale as dependências com:
 ```bash
