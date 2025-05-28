@@ -9,8 +9,7 @@ plt.rcParams.update({
     "text.usetex":True,
 })
 set_appearance_mode("light")
-WHITE_COLOR = "#ebebeb"
-
+WHITE_COLOR = "#f5f5f5"
 
 class IntegralCalculatorApp(CTk):
     def __init__(self):
@@ -20,17 +19,17 @@ class IntegralCalculatorApp(CTk):
         self.title("Calculadora Integral")
         self.geometry("420x500")
         self.create_widgets()
+        self.protocol("WM_DELETE_WINDOW", lambda: self.delete_window())
 
-    
+    def delete_window(self):
+        plt.close("all")
+        self.destroy()
 
     def create_widgets(self):
-        #app_font = CTkFont(family='Consolas', size=14)
-        #app_font.actual()
-
-        self.configure(fg_color="#f5f5f5")
+        self.configure(fg_color=WHITE_COLOR)
 
         # Título
-        title_label = CTkLabel(self, text="🧮 Calculadora de Integrais e Derivadas", font=("Consolas", 18, "bold"), text_color="#2c3e50")
+        title_label = CTkLabel(self, text="🧮 Calculadora de Integrais e Derivadas", font=("Arial", 18, "bold"), text_color="#2c3e50")
         title_label.pack(pady=(15, 5))
 
         # Campo de entrada
@@ -124,13 +123,13 @@ class IntegralCalculatorApp(CTk):
         x = sp.symbols('x')
         try:
             func = self.parse_input(func_str)
-            first_derivative = sp.diff(func, x)
-            second_derivative = sp.diff(func, x, 2)
+            first_derivative = sp.diff(func, x).doit()
+            second_derivative = sp.diff(func, x, 2).doit()
             
             self.update_plot(
                 f"1º Ordem:${sp.latex(sp.simplify(first_derivative))}$\n2º Ordem:${sp.latex(sp.simplify(second_derivative))}$",
                 font_size=18,
-                x_pos=0.1,
+                x_pos=-0.1,
                 y_pos=0.3
             )
 
@@ -198,4 +197,4 @@ class IntegralCalculatorApp(CTk):
 if __name__ == "__main__":
     app = IntegralCalculatorApp()
     app.mainloop()
-    plt.close("all")
+
