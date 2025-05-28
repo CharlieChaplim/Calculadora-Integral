@@ -154,7 +154,7 @@ class IntegralCalculatorApp(CTk):
             integral = sp.integrate(func, x)
             
             self.update_plot(
-                f"${sp.latex(sp.simplify(integral))} + C$",
+                f"${sp.latex(sp.simplify(integral))}$",
                 font_size=25,
                 x_pos=0.4,
                 y_pos=0.5
